@@ -32,7 +32,7 @@
 # ⚡ One-Line Install
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/majid-abbasi/sni-spoof-mja/main/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/majid-abbasi/sni-spoof.mja/main/install.sh)
 ```
 
 ---
