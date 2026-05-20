@@ -1,0 +1,7 @@
+{
+  "LISTEN_HOST": "127.0.0.1",
+  "LISTEN_PORT": 64533,
+  "CONNECT_IP": "104.19.229.21",
+  "CONNECT_PORT": 443,
+  "FAKE_SNI": "hcaptcha.com"
+}
