@@ -4,3 +4,11 @@
 
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/majid-abbasi/sni-spoof-mja/main/install.sh)
+
+
+
+## Manager Menu
+
+After installation:
+
+mja
