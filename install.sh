@@ -23,17 +23,14 @@ banner() {
 }
 
 check_root() {
-    if [ "$EUID" -ne 0 ]; then
-        echo -e "${RED}Run as root!${NC}"
-        exit 1
-    fi
+    [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
 }
 
 install_packages() {
+
     echo -e "${YELLOW}Installing dependencies...${NC}"
 
     if command -v apt >/dev/null 2>&1; then
-        apt update -y
         apt install -y curl wget nano golang-go
     elif command -v yum >/dev/null 2>&1; then
         yum install -y curl wget nano golang
@@ -45,9 +42,10 @@ install_packages() {
 }
 
 install_files() {
-    echo -e "${YELLOW}Downloading files...${NC}"
 
-    mkdir -p "$INSTALL_DIR"
+    mkdir -p "$INSTALL_DIR/backup"
+
+    echo -e "${YELLOW}Downloading files...${NC}"
 
     curl -L "$REPO/sni-spoof-mja" -o "$INSTALL_DIR/sni-spoof-mja"
     curl -L "$REPO/config.json" -o "$INSTALL_DIR/config.json"
@@ -56,7 +54,6 @@ install_files() {
 }
 
 create_service() {
-    echo -e "${YELLOW}Creating systemd service...${NC}"
 
 cat > "$SERVICE_FILE" <<EOF
 [Unit]
@@ -66,7 +63,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=$INSTALL_DIR
-ExecStart=/bin/bash -c "cd $INSTALL_DIR && $INSTALL_DIR/sni-spoof-mja"
+ExecStart=/bin/bash -c "cd $INSTALL_DIR && ./sni-spoof-mja"
 Restart=always
 RestartSec=3
 
@@ -80,32 +77,75 @@ EOF
 }
 
 create_manager() {
+
 cat > "$MANAGER_FILE" <<'EOF'
 #!/bin/bash
 
 APP="sni-spoof-mja"
 DIR="/etc/sni-spoof-mja"
+BACKUP="$DIR/backup"
+
+mkdir -p "$BACKUP"
 
 while true; do
 clear
-echo "==== MJA Manager ===="
+
+echo "======================"
+echo "      MJA MENU"
+echo "======================"
 echo "1) Edit Config"
 echo "2) Restart"
 echo "3) Status"
 echo "4) Logs"
-echo "5) Remove"
-echo "6) Exit"
+echo "5) Backup Config"
+echo "6) Restore Config"
+echo "7) Remove"
+echo "8) Exit"
 echo ""
 
 read -p "Select: " c
 
 case $c in
 
-1) nano $DIR/config.json ;;
-2) systemctl restart $APP ;;
-3) systemctl status $APP ;;
-4) journalctl -u $APP -n 50 --no-pager ;;
+1)
+nano $DIR/config.json
+;;
+
+2)
+systemctl restart $APP
+;;
+
+3)
+systemctl status $APP
+;;
+
+4)
+journalctl -u $APP -n 50 --no-pager
+;;
+
 5)
+cp $DIR/config.json $BACKUP/config-$(date +%F-%H-%M-%S).json
+echo "Backup done"
+sleep 2
+;;
+
+6)
+ls $BACKUP
+echo ""
+read -p "Enter file: " f
+
+if [ -f "$BACKUP/$f" ]; then
+cp "$BACKUP/$f" "$DIR/config.json"
+systemctl restart $APP
+echo "Restored"
+else
+echo "Not found"
+fi
+
+sleep 2
+;;
+
+7)
 systemctl stop $APP
 systemctl disable $APP
 rm -rf $DIR
@@ -114,7 +154,11 @@ rm -f /usr/local/bin/mja
 systemctl daemon-reload
 exit
 ;;
-6) exit ;;
+
+8)
+exit
+;;
+
 esac
 
 done
@@ -124,10 +168,8 @@ chmod +x "$MANAGER_FILE"
 }
 
 finish() {
-    echo -e "${GREEN}======================================"
-    echo " Installed Successfully!"
-    echo " Run: mja"
-    echo -e "======================================${NC}"
+    echo -e "${GREEN}Installed Successfully${NC}"
+    echo "Run: mja"
 }
 
 banner
