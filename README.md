@@ -55,6 +55,7 @@ sni-spoof-mja/
 ├── install.sh
 ├── config.json
 ├── sni-spoof-mja
+├── sni-spoof-mja.tar.gz
 └── README.md
 ```
 
