@@ -34,7 +34,18 @@
 ```bash
 bash <(curl -Ls https://raw.githubusercontent.com/majid-abbasi/sni-spoof.mja/main/install.sh)
 ```
+⚡ Local Installation
 
+Upload this file to your server:
+
+sni-spoof-mja.tar.gz
+
+Then run:
+
+tar -xzf sni-spoof-mja.tar.gz
+cd sni-spoof-mja
+chmod +x install.sh
+sudo ./install.sh
 ---
 
 # 📦 Repository Structure
