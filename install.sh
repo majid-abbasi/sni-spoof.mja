@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 APP_NAME="sni-spoof-mja"
 INSTALL_DIR="/etc/${APP_NAME}"
 SERVICE_FILE="/etc/systemd/system/${APP_NAME}.service"
@@ -17,18 +15,19 @@ NC='\033[0m'
 
 banner() {
     clear
-    echo -e "${BLUE}======================================"
+    echo "======================================"
     echo "        SNI SPOOF MJA INSTALLER"
-    echo -e "======================================${NC}"
+    echo "======================================"
 }
 
 check_root() {
-    [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
+    if [ "$EUID" -ne 0 ]; then
+        echo "Run as root!"
+        exit 1
+    fi
 }
 
 install_packages() {
-
-    echo -e "${YELLOW}Installing dependencies...${NC}"
 
     if command -v apt >/dev/null 2>&1; then
         apt install -y curl wget nano golang-go
@@ -44,8 +43,6 @@ install_packages() {
 install_files() {
 
     mkdir -p "$INSTALL_DIR/backup"
-
-    echo -e "${YELLOW}Downloading files...${NC}"
 
     curl -L "$REPO/sni-spoof-mja" -o "$INSTALL_DIR/sni-spoof-mja"
     curl -L "$REPO/config.json" -o "$INSTALL_DIR/config.json"
@@ -126,23 +123,14 @@ journalctl -u $APP -n 50 --no-pager
 5)
 cp $DIR/config.json $BACKUP/config-$(date +%F-%H-%M-%S).json
 echo "Backup done"
-sleep 2
 ;;
 
 6)
 ls $BACKUP
 echo ""
-read -p "Enter file: " f
+read -p "File: " f
 
-if [ -f "$BACKUP/$f" ]; then
-cp "$BACKUP/$f" "$DIR/config.json"
-systemctl restart $APP
-echo "Restored"
-else
-echo "Not found"
-fi
-
-sleep 2
+cp "$BACKUP/$f" "$DIR/config.json" && systemctl restart $APP
 ;;
 
 7)
@@ -168,8 +156,10 @@ chmod +x "$MANAGER_FILE"
 }
 
 finish() {
-    echo -e "${GREEN}Installed Successfully${NC}"
-    echo "Run: mja"
+    echo "======================================"
+    echo " Installed Successfully"
+    echo " Run: mja"
+    echo "======================================"
 }
 
 banner
