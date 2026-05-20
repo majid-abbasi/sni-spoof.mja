@@ -40,6 +40,10 @@ Upload this file to your server:
 
 sni-spoof-mja.tar.gz
 
+or:
+
+wget https://raw.githubusercontent.com/majid-abbasi/sni-spoof.mja/refs/heads/main/sni-spoof-mja.tar.gz
+
 Then run:
 
 tar -xzf sni-spoof-mja.tar.gz
